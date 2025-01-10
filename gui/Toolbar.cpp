@@ -71,7 +71,7 @@ void Toolbar::initButtons(EditorView* editorView)
 	setModified(modified);
 	elements.push_back(pathE);
 
-	stats = new TextElement("ZZ characters", 20, 0, MONOSPACED);
+	stats = new TextElement("ZZ Zeichen", 20, 0, MONOSPACED);
 	stats->position(10, SCREEN_HEIGHT - 35);
 	elements.push_back(stats);
 
@@ -92,45 +92,45 @@ void Toolbar::initButtons(EditorView* editorView)
 	elements.push_back(con);
 	elements.push_back(bot);
 
-	con->add((new Button("Exit", SELECT_BUTTON, dark, bsize))->setAction([this, isInsert, keyboard, textField, editorView](){
+	con->add((new Button("Beenden", SELECT_BUTTON, dark, bsize))->setAction([this, isInsert, keyboard, textField, editorView](){
 		if (isInsert) {
 			stowKeyboard(keyboard, textField, editorView);
 			return;
 		}
 		if (modified && !displayedPrompt) {
 			displayedPrompt = true;
-			textField->setStatus("Unsaved changes! Press [Exit] again to confirm");
+			textField->setStatus("Ungespeicherte Aenderungen! Druecke [Beenden] erneut, zum bestaetigen");
 			return;
 		}
 		((MainDisplay*)RootDisplay::mainDisplay)->closeEditor();
 	}));
 
-	con->add((new Button("Save", START_BUTTON, dark, bsize))->setAction([this, textField, editor](){
+	con->add((new Button("Speichern", START_BUTTON, dark, bsize))->setAction([this, textField, editor](){
 		// perform a save
 		this->setModified(false);
 		bool success = editor->save();
 		if (success) {
-			textField->setStatus("File saved successfully");
+			textField->setStatus("Datei erfolgreich gespeichert");
 		}
 	})),
 
-	con->add((new Button(isInsert ? "Caps" : "Copy", X_BUTTON, dark, bsize))->setAction([isInsert, textField, editorView, keyboard](){
+	con->add((new Button(isInsert ? "Feststelltaste" : "Kopieren", X_BUTTON, dark, bsize))->setAction([isInsert, textField, editorView, keyboard](){
 		if (isInsert) {
 			keyboard->shiftOn = !keyboard->shiftOn;
 			keyboard->updateSize();
 			return;
 		}
 		editorView->copySelection();
-		textField->setStatus("Copied selection to clipboard");
+		textField->setStatus("Auswahl in Zwischenablage kopiert");
 	}));
 
-	con->add((new Button(isInsert ? "Stow Keyboard" : "Paste", Y_BUTTON, dark, bsize))->setAction([this, isInsert, textField, keyboard, editorView](){
+	con->add((new Button(isInsert ? "Tastatur ausblenden" : "Einfuegen", Y_BUTTON, dark, bsize))->setAction([this, isInsert, textField, keyboard, editorView](){
 		if (isInsert) {
 			stowKeyboard(keyboard, textField, editorView);
 			return;
 		}
 		if (!editorView->pasteSelection()) {
-			textField->setStatus("Nothing on clipboard to paste!");
+			textField->setStatus("Nichts in der Zwischenablage zum Einfuegen!");
 		}
 	}));
 
@@ -139,25 +139,25 @@ void Toolbar::initButtons(EditorView* editorView)
 	{
 		auto historyPos = editor->historyPos;
 		auto undoHistory = editor->undoHistory;
-		bot->add((new Button("Undo", ZL_BUTTON, dark, bsize))->setAction([this, editor, textField](){
+		bot->add((new Button("Rueckgaengig", ZL_BUTTON, dark, bsize))->setAction([this, editor, textField](){
 			auto success = commonHistoryLogic(true, editor, textField);
 			editor->historyPos--;
 			if (editor->historyPos < 0) editor->historyPos = -1;
-			if (!success) textField->setStatus("Nothing to undo!");
+			if (!success) textField->setStatus("Nichts zum Rueckgaengig machen!");
 		}));
 
-		bot->add((new Button("Redo", ZR_BUTTON, dark, bsize))->setAction([this, editor, textField](){
+		bot->add((new Button("Wiederholen", ZR_BUTTON, dark, bsize))->setAction([this, editor, textField](){
 			editor->historyPos++;
 			auto success = commonHistoryLogic(false, editor, textField);
 			if (editor->historyPos > editor->undoHistory.size()) editor->historyPos = editor->undoHistory.size();
-			if (!success) textField->setStatus("Nothing to redo!");
+			if (!success) textField->setStatus("Nichts zum Wiederholen!");
 		}));
 
-		Button deselect("Deslct", L_BUTTON, dark, bsize);
-		findButton = (Button*)(new Button("Find...", L_BUTTON, dark, bsize, deselect.width))->setAction([this, textField, editorView, editor](){
+		Button deselect("Abwaehlen", L_BUTTON, dark, bsize);
+		findButton = (Button*)(new Button("Suche...", L_BUTTON, dark, bsize, deselect.width))->setAction([this, textField, editorView, editor](){
 			if (textField->selectedWidth == 1) {
 				// size 1 uses Find function since we're out of buttons
-				auto popup = new TextQueryPopup("Enter search criteria", "Find", [this, textField, editor](const char* query){
+				auto popup = new TextQueryPopup("Suchkriterien eingeben", "Suchen", [this, textField, editor](const char* query){
 					// we're gonna try to find the first occurrence of the case-insensitive string they give us
 					int res = editor->text->find(query, textField->selectedPos + 1);
 					if (res == std::string::npos) {
@@ -165,11 +165,11 @@ void Toolbar::initButtons(EditorView* editorView)
 						res = editor->text->find(query);
 						if (res == std::string::npos) {
 							// still not found...
-							textField->setStatus("No match found in file");
+							textField->setStatus("Kein Treffer in der Datei gefunden");
 							this->searchQuery.assign(""); // reset saved search
 							return;
 						}
-						textField->setStatus("Search hit bottom, continued at top");
+						textField->setStatus("Suchergebnis wird am Ende, oben fortgesetzt");
 					}
 					textField->selectedPos = res;
 					this->searchQuery.assign(query); // save query if we had a match
@@ -181,18 +181,18 @@ void Toolbar::initButtons(EditorView* editorView)
 				return;
 			}
 			textField->selectedWidth -= 1;
-			if (textField->selectedWidth <= 1) findButton->updateText("Find...");
+			if (textField->selectedWidth <= 1) findButton->updateText("Suche...");
 			editorView->reset_bounds();
 		});
 		bot->add(findButton);
 
-		bot->add((new Button("Select", R_BUTTON, dark, bsize))->setAction([this, textField, editorView](){
+		bot->add((new Button("Auswaehlen", R_BUTTON, dark, bsize))->setAction([this, textField, editorView](){
 			textField->selectedWidth += 1;
 			editorView->reset_bounds();
-			if (textField->selectedWidth > 1) findButton->updateText("Deslct");
+			if (textField->selectedWidth > 1) findButton->updateText("Abwaehlen");
 		}));
 
-		bot->add((new Button("Show Keyboard", A_BUTTON, dark, bsize))->setAction([this, textField, keyboard, editorView](){
+		bot->add((new Button("Zeige Tastatur", A_BUTTON, dark, bsize))->setAction([this, textField, keyboard, editorView](){
 			if (keyboard == NULL)
 			{
 				auto keyboard = new EKeyboard([editorView](char input) {
@@ -237,7 +237,7 @@ void Toolbar::initButtons(EditorView* editorView)
 
 	}
 
-	con->add((new Button(isInsert ? "Backspace" : "Delete", B_BUTTON, dark, bsize))->setAction([textField, editor, editorView](){
+	con->add((new Button(isInsert ? "Ruecktaste" : "Loeschen", B_BUTTON, dark, bsize))->setAction([textField, editor, editorView](){
 		// in insert mode, delete is a "backspace-style" action, and moves the cursor left if it can
 		if (textField->insertMode)
 		{

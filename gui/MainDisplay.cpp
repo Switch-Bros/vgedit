@@ -53,7 +53,7 @@ void MainDisplay::closeEditor()
 		// (single file mode)
 
 		if (callbackPath != "") {
-			std::cout << "Launching " << callbackPath << std::endl;
+			std::cout << "Starte " << callbackPath << std::endl;
 			bool success = false;
 
 			#ifdef __WIIU__
@@ -73,7 +73,7 @@ void MainDisplay::closeEditor()
 			#endif
 
 			if (!success) {
-				std::cout << "Failed to launch " << callbackPath << std::endl;
+				std::cout << "Starten fehlgeschlagen " << callbackPath << std::endl;
 				exit(1);
 			}
 		}

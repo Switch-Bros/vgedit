@@ -259,7 +259,7 @@ void TextInputElement::render(Element* parent)
   auto toolbar = editorView->toolbar;
   if (toolbar->stats != NULL && !customStatus) {
     std::ostringstream status;
-    status << len << " characters" << " (";
+    status << len << " Zeichen" << " (";
     status << currentLineNo << ", " << (selectedPos - editor->curLinePos);
     status << ", " << selectedPos << ")";
     toolbar->statusText = status.str();

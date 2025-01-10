@@ -20,7 +20,7 @@ int Editor::open(const char* filename)
 	if (input.tellg() == -1)
 	{
 		// quit if file is missing
-		cout << "target file does not exist" << endl;
+		cout << "Zieldatei existiert nicht" << endl;
 		return -1;
 	}
 
