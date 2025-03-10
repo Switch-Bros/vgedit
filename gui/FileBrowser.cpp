@@ -212,7 +212,7 @@ void FileBrowser::listfiles()
 	// create a hardcoded "up" link to the parent directory
 	if (*pwd != std::string("/") && *pwd != std::string(START_PATH))
 	{
-		FileCard* card = new FileCard(true, ".. (parent)");
+		FileCard* card = new FileCard(true, ".. (uebergeordnet)");
 		card->position(this->x + (count % cardsPerRow) * card->width, this->y + topOfList + (count / cardsPerRow) * card->height);
 		std::string cwd = dir_name(*pwd);
 		card->path = new std::string(cwd == "" ? "/" : cwd);
@@ -281,11 +281,11 @@ void FileBrowser::listfiles()
 #endif
 	};
 
-	con->add((new Button("Exit", SELECT_BUTTON, true))->setAction(quitWrapper));
+	con->add((new Button("Beenden", SELECT_BUTTON, true))->setAction(quitWrapper));
 
-	con->add((new Button("New Folder", X_BUTTON, true))->setAction([this, mainDisplay](){
+	con->add((new Button("Neuer Ordner", X_BUTTON, true))->setAction([this, mainDisplay](){
 		std::function<void(const char*)> createFunc = [this](const char* name){
-			printf("Creating folder [%s]\n", name);
+			printf("Erstelle Ordner [%s]\n", name);
 #ifndef WIN32
 			::mkdir((*this->pwd + "/" + name).c_str(), 0775);
 #else
@@ -293,16 +293,16 @@ void FileBrowser::listfiles()
 #endif
 			this->listfiles();
 		};
-		mainDisplay->switchSubscreen(new TextQueryPopup("Enter new folder name", "Create", createFunc));
+		mainDisplay->switchSubscreen(new TextQueryPopup("Ordnername eingeben", "Erstellen", createFunc));
 	}));
 
-	con->add((new Button("New File", Y_BUTTON, true))->setAction([this, mainDisplay](){
+	con->add((new Button("Neue Datei", Y_BUTTON, true))->setAction([this, mainDisplay](){
 		std::function<void(const char*)> createFunc = [this](const char* name){
-			printf("Creating file [%s]\n", name);
+			printf("Erstelle Datei [%s]\n", name);
 			std::ofstream output((*this->pwd + "/" + name).c_str());
 			this->listfiles();
 		};
-		mainDisplay->switchSubscreen(new TextQueryPopup("Enter new file name", "Create", createFunc));
+		mainDisplay->switchSubscreen(new TextQueryPopup("Dateiname eingeben", "Erstellen", createFunc));
 	}));
 
 	con->position(SCREEN_WIDTH - con->width - this->x * 2, topOfList - 85 / SCALER);

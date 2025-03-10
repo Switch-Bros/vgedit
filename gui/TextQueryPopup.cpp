@@ -49,19 +49,19 @@ TextQueryPopup::TextQueryPopup(const char* prompt, const char* ctaText, std::fun
 	auto con = new Container(ROW_LAYOUT);
 	bool dark = true;
 
-	child(((new Button("Backspace", B_BUTTON, dark))->setAction([this](){
+	child(((new Button("Ruecktaste", B_BUTTON, dark))->setAction([this](){
 		if (!query.empty())
 			query.pop_back();
 		queryText->setText(query);
 		queryText->update();
 	}))->setPosition(SCREEN_WIDTH - 200, 230));
 
-	child(((new Button("Caps", L_BUTTON, dark))->setAction([keyboard](){
+	child(((new Button("Feststelltaste", L_BUTTON, dark))->setAction([keyboard](){
 		keyboard->shiftOn = !keyboard->shiftOn;
 		keyboard->updateSize();
 	}))->setPosition(20, 230));
 
-	con->add(((new Button("Cancel", Y_BUTTON, dark))->setAction(cleanUp)));
+	con->add(((new Button("Abbrechen", Y_BUTTON, dark))->setAction(cleanUp)));
 
 	con->add(((new Button(ctaText, X_BUTTON, dark))->setAction([this, onConfirm, cleanUp](){
 		onConfirm(query.c_str());
